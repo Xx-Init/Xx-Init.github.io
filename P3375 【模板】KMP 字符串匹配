@@ -15,7 +15,7 @@ const int N = 1e6+6;
 inline ll read(){ll x=0;char z;while((z=getchar())<48);do x=x*10+(z^48);while((z=getchar())>47);return x;}
 //<head>
 
-//kmp匹配模板，前缀函数模板
+//kmp匹配模板，前缀函数模板  O(n)
 
 vector<int> prefix_function(string s){ //前缀函数
     int len = s.size();
