@@ -1,0 +1,93 @@
+#include <bits/stdc++.h>
+#define DEBUG cout << "---------- " << __LINE__ << " ----------" << endl;
+#define endl "\n"
+#define SZ(x) ((int)(x).size())
+#define all(x) (x).begin(), (x).end()
+#define count1_Binary(x) __builtin_popcountll(x)//求一个数二进制里有多少个1
+#define smallest_1(x) __builtin_ffsll(x)//求最小的1在第几位
+using namespace std;
+using ll = long long;
+using u64 = unsigned long long;
+const int inf = 0x7fffffff;
+const long long mod = 1e9+7;
+const double Pi = acos(-1);
+const int N = 1e5+6;
+inline ll read(){ll x=0;char z;while((z=getchar())<48);do x=x*10+(z^48);while((z=getchar())>47);return x;}
+//<head>
+
+//01tries, 建树
+
+//思路：建树 --> 每个节点到根节点的异或和 --> 最大异或对 --> 01tries 
+
+int head[N], tot, xo[N], trie[N*32][2], idx = 2; //每个整数拆成32位的二进制
+
+struct Node{int to, next, w;}edge[N<<1]; //next是该节点的下一条边
+
+inline void add(int x, int y, int z){ //建树
+    edge[++ tot].next = head[x];
+    edge[tot].to = y;
+    edge[tot].w = z;
+    head[x] = tot;
+    edge[++ tot].next = head[y];
+    edge[tot].to = x;
+    edge[tot].w = z;
+    head[y] = tot;
+}
+
+//dfs计算
+inline void dfs(int u, int fa){  //当前节点， 父节点
+    for(int i = head[u]; i != 0; i = edge[i].next){  //遍历子节点
+        if(edge[i].to != fa){
+            xo[edge[i].to] = xo[u]^edge[i].w;
+            dfs(edge[i].to, u);
+        }
+    }
+}
+
+inline void insert(int x){ //插入tries节点
+    int p = 1;
+    for(int i = 30; i >= 0; i --){
+        int u = (x>>i)&1;
+        if(!trie[p][u]) trie[p][u] = idx ++;
+        p = trie[p][u];
+    }
+}
+
+inline ll query(int x){ ///找x的最大异或对
+    int p = 1, ans = 0;
+    for(int i = 30; i >= 0; i --){
+        int u = (x>>i)&1;
+        if(trie[p][u^1]){  //贪心找最大值，0找1  1找0；
+            p = trie[p][u^1];
+            ans +=  (1 << i);
+        }else p = trie[p][u];
+    }
+    return ans;
+}
+
+void solve(){
+    int n = read(), u, v, w;
+//-----------------------建树------------
+    for(int i = 1; i < n; i ++){
+        u = read(); v = read(); w = read();
+        add(u, v, w);
+    }
+    dfs(1, 0);
+//---------------------建01trie------------------
+    for(int i = 1; i <= n; i ++) //i必须从1开始，把0给算进去
+        insert(xo[i]);
+//---------------------求最大异或和-------------------
+    ll ans = 0;
+    for(int i = 1; i <= n; i ++)
+        ans = max(ans, query(xo[i]));
+    cout<< ans<< endl;
+}
+
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+    solve();
+    return 0;
+}
+
+
