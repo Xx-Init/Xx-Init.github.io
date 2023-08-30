@@ -1,0 +1,73 @@
+#include <bits/stdc++.h>
+#define DEBUG cout << "---------- " << __LINE__ << " ----------" << endl;
+#define endl "\n"
+#define SZ(x) ((int)(x).size())
+#define all(x) (x).begin(), (x).end()
+#define count1_Binary(x) __builtin_popcountll(x)//求一个数二进制里有多少个1
+#define smallest_1(x) __builtin_ffsll(x)//求最小的1在第几位
+using namespace std;
+using ll = long long;
+using u64 = unsigned long long;
+const int inf = 0x7fffffff;
+const long long mod = 1e9+7;
+const double Pi = acos(-1);
+const int N = 2e5+6;
+inline ll read(){ll x=0;char z;while((z=getchar())<48);do x=x*10+(z^48);while((z=getchar())>47);return x;}
+//<head>
+
+//dp
+
+/*
+dp题
+如果减去一个后缀，剩下的部分符合题意且这个后缀属于集合P，此时符合题意
+*/
+
+
+struct Node{ //可以优化掉
+    string s; 
+    bool operator < (const Node &x)const{
+        if(SZ(s) != SZ(x.s))
+            return SZ(s) < SZ(x.s);
+        else return s < x.s;
+    }
+};
+set<Node> st1;
+
+bool dp[N];
+
+void solve(){
+    string s1, s2 ="";
+    char c;
+    int len, mlen, maxn = 0;
+    fill(dp, dp+N, false);
+    dp[0] = true;
+    cin>> s1;
+    while(s1 != "."){
+        st1.insert((Node){s1});
+        cin>> s1;
+    }
+    mlen = SZ(st1.rbegin()->s);
+    while(cin>> s1) s2 += s1;
+    len = SZ(s2);
+    for(int i = 1; i <= len; i ++){
+        string s3;
+        for(int j = 1; j <= i && j <= mlen; j ++){
+            s3 = s2[i-j]+s3;
+            if(dp[i-j] && st1.find((Node){s3}) != st1.end()){
+                dp[i] = true;
+                maxn = max(maxn, i);
+                break;
+            }
+        }
+    }
+    cout<< maxn;
+}
+
+int main(){
+    //ios::sync_with_stdio(false);   //这题不可以加
+   // cin.tie(nullptr);
+    solve();
+    return 0;
+}
+
+
