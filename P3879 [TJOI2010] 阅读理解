@@ -1,0 +1,51 @@
+#include <bits/stdc++.h>
+#define DEBUG cout << "---------- " << __LINE__ << " ----------" << endl;
+#define endl "\n"
+#define SZ(x) ((int)(x).size())
+#define all(x) (x).begin(), (x).end()
+#define count1_Binary(x) __builtin_popcountll(x)//求一个数二进制里有多少个1
+#define smallest_1(x) __builtin_ffsll(x)//求最小的1在第几位
+using namespace std;
+using ll = long long;
+using u64 = unsigned long long;
+const int inf = 0x7fffffff;
+const long long mod = 1e9+7;
+const double Pi = acos(-1);
+const int N = 1e4+6;
+inline ll read(){ll x=0;char z;while((z=getchar())<48);do x=x*10+(z^48);while((z=getchar())>47);return x;}
+//<head>
+
+// mp+vector  桶排序去除
+
+map<string, vector<int> > mp;
+int cnt[N];
+void solve(){
+    int n, m, k;
+    string s;
+    cin>> n;
+    for(int i = 1; i <= n; i ++){
+        cin>> m;
+        while(m --){cin>> s; mp[s].push_back(i);}
+    }
+    cin>> k;
+    while(k --){
+        cin>> s;
+        memset(cnt, 0, sizeof(cnt));
+        for(auto &i: mp[s]){
+            if(!cnt[i]){
+                cout<< i<< ' ';
+                cnt[i] ++;
+            }
+        }
+        cout<< endl;
+    }
+}
+
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+    solve();
+    return 0;
+}
+
+
