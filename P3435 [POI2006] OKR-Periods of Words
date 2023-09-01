@@ -1,0 +1,64 @@
+#include <bits/stdc++.h>
+#define DEBUG cout << "---------- " << __LINE__ << " ----------" << endl;
+#define endl "\n"
+#define SZ(x) ((int)(x).size())
+#define all(x) (x).begin(), (x).end()
+#define count1_Binary(x) __builtin_popcountll(x)//求一个数二进制里有多少个1
+#define smallest_1(x) __builtin_ffsll(x)//求最小的1在第几位
+using namespace std;
+using ll = long long;
+using u64 = unsigned long long;
+const int inf = 0x7fffffff;
+const long long mod = 1e9+7;
+const double Pi = acos(-1);
+const int N = 1e6+6;
+inline ll read(){ll x=0;char z;while((z=getchar())<48);do x=x*10+(z^48);while((z=getchar())>47);return x;}
+//<head>
+
+//前缀函数  lenQ = lens-min(border) 最大周期 记忆化搜索;
+
+//题解，就是求最大周期，同时保证max(lenQ)<lens且max(lenQ)>=lens; 
+
+int pi[N], arr[N];  
+ll ans;
+
+int f(int i){  //递归求最小border
+    int tmp = pi[i];
+    if(arr[i] != -1) return arr[i];
+    if(pi[tmp-1]){
+        arr[tmp-1] = f(tmp-1);
+        return arr[tmp-1];
+    }else return tmp;
+}
+
+void prefix(string s){
+    int len = SZ(s);
+    for(int i = 1; i < len; i ++){
+        int j = pi[i-1];
+        while(j && s[i] != s[j]) j = pi[j-1];
+        if(s[i] == s[j]) j ++;
+        pi[i] = j;
+        if(!pi[i]) continue; //没有proper前缀
+        int lenQ = i+1-f(i);
+        if(lenQ*2 >= i+1) ans += lenQ; //符合条件即可加上
+    }
+}
+
+void solve(){
+    int n;
+    string s1;
+    cin>> n;
+    cin>> s1;
+    memset(arr, -1, sizeof(arr));
+    prefix(s1);
+    cout<< ans<< endl;
+}
+
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+    solve();
+    return 0;
+}
+
+
