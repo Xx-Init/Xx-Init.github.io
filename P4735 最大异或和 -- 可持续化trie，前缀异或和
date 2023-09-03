@@ -1,0 +1,87 @@
+#include <bits/stdc++.h>
+#define DEBUG cout << "---------- " << __LINE__ << " ----------" << endl;
+#define endl "\n"
+#define SZ(x) ((int)(x).size())
+#define all(x) (x).begin(), (x).end()
+#define count1_Binary(x) __builtin_popcountll(x)//求一个数二进制里有多少个1
+#define smallest_1(x) __builtin_ffsll(x)//求最小的1在第几位
+using namespace std;
+using ll = long long;
+using u64 = unsigned long long;
+const int inf = 0x7fffffff;
+const long long mod = 1e9+7;
+const double Pi = acos(-1);
+const int N = 6e5+6;
+inline ll read(){ll x=0;char z;while((z=getchar())<48);do x=x*10+(z^48);while((z=getchar())>47);return x;}
+//<head>
+
+// 异或前缀和  可持续化trie
+
+// 每次可以转换成 OX[p-1]^OX[N]^x, 故在对应区间[l-1, r-1]的trie(通过两区间相减)上去寻找与OX[N]^x异或和最大的OX[p-1]；
+
+
+int OX[N], tot, trie[N*32][2], cnt[N*32], head[N], l, r, x;  //前缀异或和    可持续化01trie  每个节点的个数  每棵树的头 
+char op;
+
+void insert(int p, int lst, int v){ 
+    for(int i = 28; i >= 0; i --){  //1e7差不多就是29位
+        cnt[p] = cnt[lst]+1; //在原基础上更新
+        int u = (v>>i)&1;
+        if(!trie[p][u]) trie[p][u] = ++ tot;
+        trie[p][1^u] = trie[lst][1^u];
+        p = trie[p][u];
+        lst = trie[lst][u];
+    }
+    cnt[p] = cnt[lst]+1;
+}
+
+int query(int p1, int p2, int v){
+    int ans = 0;
+    for(int i = 28; i >= 0; i --){
+        int u = (v>>i)&1;
+        if(cnt[trie[p1][1^u]]-cnt[trie[p2][1^u]]){  ///贪心，往不一样的跳
+            ans += (1<<i);
+            p1 = trie[p1][1^u];
+            p2 = trie[p2][1^u];
+        }else{
+            p1 = trie[p1][u];
+            p2 = trie[p2][u];
+        }
+    }
+    return ans;
+}
+
+void solve(){
+    int N, M, tmp;
+    cin>> N>> M;
+    for(int i = 1; i <= N; i ++){
+        cin>> tmp;
+        OX[i] = OX[i-1]^tmp;
+        head[i] = ++ tot ;
+        insert(head[i], head[i-1], OX[i]);
+    }
+    while(M --){
+        cin>> op;
+        if(op == 'A'){
+            cin>> tmp;
+            N ++;
+            OX[N] = OX[N-1]^tmp;
+            head[N] = ++ tot;
+            insert(head[N], head[N-1], OX[N]);
+        }else{
+            cin>> l>> r>> x;
+            l --; r --;
+            if(!l) cout<< max(OX[N]^x, query(head[r], head[0], OX[N]^x))<< endl;  //这个时候，可能是OX[N]^x与0异或时候最大
+            else cout<< query(head[r], head[l-1], OX[N]^x)<< endl;
+        }
+    }
+}
+
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+    solve();
+    return 0;
+}
+
+
