@@ -1,0 +1,80 @@
+#include <bits/stdc++.h>
+#define DEBUG cout << "---------- " << __LINE__ << " ----------" << endl;
+#define endl "\n"
+#define SZ(x) ((int)(x).size())
+#define all(x) (x).begin(), (x).end()
+#define count1_Binary(x) __builtin_popcountll(x)//求一个数二进制里有多少个1
+#define smallest_1(x) __builtin_ffsll(x)//求最小的1在第几位
+using namespace std;
+using ll = long long;
+using u64 = unsigned long long;
+const int inf = 0x7fffffff;
+const long long mod = 1e9+7;
+const double Pi = acos(-1);
+const int N = 5e5+6;
+inline ll read(){ll x=0;char z;while((z=getchar())<48);do x=x*10+(z^48);while((z=getchar())>47);return x;}
+//<head>
+
+//前缀异或和， 01trie（从01trie中取第k大）， 堆， 
+
+/*题解 
+首先想到前缀异或和，通过XO[i-1]^XO[j]即可得到i到j之间的异或和，(因此，建树时候从0开始)
+然后只需获得最大的k个异或值序列
+由于有限制条件i < j,便导致计算不便，可以采用扩展区间到i != j 的情况，再获得前2k个最大异或值，答案最终除以2
+
+此时便可想到01trie，通过01trie先获得每个i对应的第rk大异或值，插入优先队列中
+每次取队列头，在查询对应i的第rk+1大的异或值，扔到队列中
+*/
+
+
+ll XO[N], trie[N*32][2], idx = 2;
+int num[N*32];  //通过size记录每个节点的子树个数
+struct Node{ll id, rk, w; bool operator < (const Node &o)const{return w < o.w;}};
+//struct Node{int id,rk;long long w;bool operator <(const Node &a)const{return w<a.w;}};
+priority_queue<Node> q;
+
+void insert(ll x){  //插入trie节点
+    int p = 1;
+    for(int i = 31; i >= 0; i --){
+        int u = (x>>i)&1; 
+        num[p] ++;
+        if(!trie[p][u]) trie[p][u] = idx ++;
+        p = trie[p][u];
+    }
+    num[p] ++;
+}
+
+ll query(ll x, ll rk){ //查询与x异或值第rk大的异或和
+    ll p = 1, ans = 0;
+    for(int i = 31; i >= 0; i --){
+        int u = (x>>i)&1;
+        if(!trie[p][u^1]) p = trie[p][u]; //没有不一样的，就延自己走下去
+        else if(rk <= num[trie[p][u^1]]) p = trie[p][u^1], ans += (1LL<< i); //看看还能不能取相异的节点
+        else rk -= num[trie[p][u^1]], p = trie[p][u];  //如果相异节点的个数小于rk,说明不能取
+    }
+    return ans;
+}
+
+void solve(){
+    ll n = read(), k = read();
+    k <<= 1;
+    for(ll i = 1; i <= n; i ++){
+        ll tmp = read();
+        XO[i] = XO[i-1]^tmp;   //前缀和
+    }
+    for(ll i = 0; i <= n; i ++) insert(XO[i]);   //建01trie
+    for(ll i = 0; i <= n; i ++) q.push((Node){i, 1, query(XO[i], 1)});   
+    ll ans = 0;
+    for(int i = 1; i <= k; i ++){
+        Node tmp = q.top(); ans += tmp.w; q.pop();
+        if(tmp.rk < n) q.push((Node){tmp.id, tmp.rk+1, query(XO[tmp.id], tmp.rk+1)});
+    }
+    cout<< ans/2;
+}
+
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+    solve();
+    return 0;
+}v
