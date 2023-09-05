@@ -1,0 +1,50 @@
+#include <bits/stdc++.h>
+#define DEBUG cout << "---------- " << __LINE__ << " ----------" << endl;
+#define endl "\n"
+#define SZ(x) ((int)(x).size())
+#define all(x) (x).begin(), (x).end()
+#define count1_Binary(x) __builtin_popcountll(x)//求一个数二进制里有多少个1
+#define smallest_1(x) __builtin_ffsll(x)//求最小的1在第几位
+using namespace std;
+using ll = long long;
+using u64 = unsigned long long;
+const long long inf = 0x7ffffffffff;
+const long long mod = 1e9+7;
+const double Pi = acos(-1);
+const int N = 5e6+6;
+inline ll read(){ll x=0;char z;while((z=getchar())<48);do x=x*10+(z^48);while((z=getchar())>47);return x;}
+//<head>
+
+//差分  维护区间
+
+int A[N], B[N]; //  原始成绩  差分数组
+
+void solve(){
+    int n, p;
+    cin>> n>> p;
+    for(int i = 1; i <= n; i ++){
+        cin>> A[i];
+        B[i] = A[i]-A[i-1];
+    }
+    int x, y, z;
+    for(int i = 1; i <= p; i ++){
+        cin>> x>> y>> z;
+        B[x] += z;
+        B[y+1] -= z;
+    }
+    int ans = 100, now = A[0];
+    for(int i = 1; i <= n; i ++){
+        now += B[i];
+        ans = min(ans, now);
+    }
+    cout<< ans<< endl;
+}
+
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+    solve();
+    return 0;
+}
+
+
