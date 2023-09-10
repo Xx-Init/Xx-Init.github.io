@@ -1,0 +1,65 @@
+#include <bits/stdc++.h>
+#define DEBUG cout << "---------- " << __LINE__ << " ----------" << endl;
+#define endl "\n"
+#define SZ(x) ((int)(x).size())
+#define all(x) (x).begin(), (x).end()
+#define count1_Binary(x) __builtin_popcountll(x)//求一个数二进制里有多少个1
+#define smallest_1(x) __builtin_ffsll(x)//求最小的1在第几位
+#define lowbit(x) ((x&(-x))) 
+using namespace std;
+using ll = long long;
+using u64 = unsigned long long;
+const int inf = 0x7fffffff;
+const long long mod = 1e9+7;
+const double Pi = acos(-1);
+const int N = 1e5+6;
+inline ll read(){ll x=0;char z;while((z=getchar())<48);do x=x*10+(z^48);while((z=getchar())>47);return x;}
+//<head>
+
+//离散化(也不算)  结论题 树状数组
+ 
+//离散化后，求双向冒泡的次数。  结论题  用树状数组维护区间信息
+
+int sum[N], n;  //树状数组
+
+void insert(int x){ //把x在的区间都标记一遍，表示x来过
+    for(int i = x; i <= n; i += lowbit(i)) sum[i] ++;
+}
+
+int query(int x){  //查询sum 1到x的和
+    int res = 0;
+    for(int i = x; i > 0; i -= lowbit(i)) res += sum[i];
+    return res;
+}
+
+struct Node{
+    int num, rk;
+    bool operator < (const Node& o) const{
+        if(num != o.num) return num < o.num;
+        else return rk < o.rk;
+    }
+}A[N];
+
+void solve(){
+    cin>> n;
+    for(int i = 1; i <= n; i ++){
+        cin>> A[i].num;
+        A[i].rk = i;
+    }
+    sort(A+1, A+1+n);
+    int ans = 1;  //即使有序也会叫一次
+    for(int i = 1; i <= n; i ++){
+        insert(A[i].rk);
+        ans = max(ans, i-query(i));
+    }
+    cout<< ans<< endl;
+}
+
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+    solve();
+    return 0;
+}
+
+
