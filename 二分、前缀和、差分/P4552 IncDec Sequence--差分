@@ -1,0 +1,46 @@
+#include <bits/stdc++.h>
+#define DEBUG cout << "---------- " << __LINE__ << " ----------" << endl;
+#define endl "\n"
+#define SZ(x) ((int)(x).size())
+#define all(x) (x).begin(), (x).end()
+#define count1_Binary(x) __builtin_popcountll(x)//求一个数二进制里有多少个1
+#define smallest_1(x) __builtin_ffsll(x)//求最小的1在第几位
+#define lowbit(x) ((x&(-x))) 
+using namespace std;
+using ll = long long;
+using u64 = unsigned long long;
+const int inf = 0x7fffffff;
+const long long mod = 1e9+7;
+const double Pi = acos(-1);
+const int N = 1e5+6;
+inline ll read(){ll x=0;char z;while((z=getchar())<48);do x=x*10+(z^48);while((z=getchar())>47);return x;}
+//<head>
+
+// 差分
+
+//题解: 差分后，可以看成所有正负数相消后，最后剩下的那一个数再一步步的回到0
+
+ll A[N], B[N];
+
+void solve(){
+    ll n, num1 = 0, num2 = 0;
+    cin>> n;
+    cin>> A[1];
+    for(int i = 2; i <= n; i ++){
+        cin>> A[i];
+        B[i] = A[i]-A[i-1];
+        if(B[i] > 0) num1 += B[i];
+        else num2 -= B[i];
+    }
+    cout<< max(num1, num2)<< endl;  //直接输出大的一个即可
+    cout<< abs(num1-num2)+1;  //最后剩下的数字就是num1-num2,故这个数回归到0（包括0）的任何数都是可以到达的
+}   
+
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+    solve();
+    return 0;
+}
+
+
