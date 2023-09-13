@@ -1,0 +1,70 @@
+#include <bits/stdc++.h>
+#define DEBUG cout << "---------- " << __LINE__ << " ----------" << endl;
+#define endl "\n"
+#define SZ(x) ((int)(x).size())
+#define all(x) (x).begin(), (x).end()
+#define count1_Binary(x) __builtin_popcountll(x)//求一个数二进制里有多少个1
+#define smallest_1(x) __builtin_ffsll(x)//求最小的1在第几位
+#define lowbit(x) ((x&(-x))) 
+using namespace std;
+using ll = long long;
+using u64 = unsigned long long;
+const int inf = 0x7fffffff;
+const long long mod = 1e9+7;
+const double Pi = acos(-1);
+const int N = 1e4+6;
+inline ll read(){ll x=0;char z;while((z=getchar())<48);do x=x*10+(z^48);while((z=getchar())>47);return x;}
+//<head>
+
+//扩展并查集
+
+//题解：并查集分好类后统计个数,根据fa数组直接判断有多少类,fa[i] = i表示一个类
+
+
+int fa[N*2], n; //扩展并查集，开双倍，1-n表示朋友， n+1-2*n表示敌人
+
+inline void init(int n){
+    for(int i = 0; i <= n; i ++) fa[i] = i;
+}
+
+inline int find(int x){
+    if(fa[x] == x) return x;
+    else return fa[x] = find(fa[x]);
+}
+
+inline bool same(int x, int y){
+    return find(x) == find(y);
+}
+
+inline void merge(int x, int y){
+    fa[find(x)] = find(y);
+}
+
+void solve(){
+    int m, x, y;
+    cin>> n>> m;
+    init(n*2);
+    char opt;
+    for(int i = 1; i <= m; i ++){
+        cin>> opt>> x>> y;
+        if(opt == 'F') merge(x, y);
+        else{
+            merge(y+n, x); //+n的在前，保证前n个的fa都在1~n内
+            merge(x+n, y);
+        }
+    }
+    int tot = 0;
+    for(int i = 1; i <= n; i ++){
+        if(find(i) == i) tot ++;
+    }
+    cout<< tot<< endl;
+}
+
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+    solve();
+    return 0;
+}
+
+
