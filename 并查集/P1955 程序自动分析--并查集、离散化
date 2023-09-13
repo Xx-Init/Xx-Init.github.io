@@ -1,0 +1,81 @@
+#include <bits/stdc++.h>
+#define DEBUG cout << "---------- " << __LINE__ << " ----------" << endl;
+#define endl "\n"
+#define SZ(x) ((int)(x).size())
+#define all(x) (x).begin(), (x).end()
+#define count1_Binary(x) __builtin_popcountll(x)//求一个数二进制里有多少个1
+#define smallest_1(x) __builtin_ffsll(x)//求最小的1在第几位
+using namespace std;
+using ll = long long;
+using u64 = unsigned long long;
+const int inf = 0x7fffffff;
+const long long mod = 1e9+7;
+const double Pi = acos(-1);
+const int N = 1e6+6;
+inline ll read(){ll x=0;char z;while((z=getchar())<48);do x=x*10+(z^48);while((z=getchar())>47);return x;}
+//<head>
+int fa[N], book[N*2], tot;
+
+struct Node{
+    int i, j, e;
+}A[N];
+
+inline void init(int n){
+    for(int i = 1; i <= n; i ++) fa[i] = i;
+}
+
+int find(int x){
+    if(fa[x] == x) return x;
+    else return fa[x] = find(fa[x]);  //压缩路径
+}
+
+bool cmp1(Node x1, Node x2){
+    return x1.e > x2.e;
+}
+
+void solve(){
+    int T, n;
+    cin>> T;
+    while(T --){
+        memset(A, 0, sizeof(A));
+        memset(book, 0, sizeof(book));
+        memset(fa, 0, sizeof(fa));
+        cin>> n;
+        tot = 1;
+        //----------------输入数据并进行离散化----------------
+        for(int i = 1; i <= n; i ++){
+            cin>> A[i].i>> A[i].j >> A[i].e;
+            book[tot ++] = A[i].i;
+            book[tot ++] = A[i].j;
+        }
+        sort(book+1, book+tot+1);
+        int len = unique(book+1, book+tot+1)-book-1;
+        for(int i = 1; i <= n; i ++){
+            A[i].i = lower_bound(book+1, book+len+1, A[i].i)-book-1;
+            A[i].j = lower_bound(book+1, book+len+1, A[i].j)-book-1;
+        }
+        //----------------------------------------------------
+        init(len);  //初始化并查集
+        sort(A+1, A+n+1, cmp1);
+        bool flag = true;
+        for(int i = 1; i <= n; i ++){
+            int r1 = find(A[i].i);
+            int r2 = find(A[i].j);
+            if(A[i].e == 1){  //将两个归为同一集合；
+                fa[r1] = r2;  //合并
+            }else if(r1 == r2){ //出现矛盾
+                cout<< "NO\n";
+                flag = false;
+                break;
+            }
+        }
+        if(flag) cout<< "YES\n";
+    }
+}
+
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+    solve();
+    return 0;
+}
